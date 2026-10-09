@@ -40,32 +40,50 @@ export interface AllocationResult {
   unusedWaterLitres: number
 
   // Minimum guaranteed satisfaction fraction,
-  // not necessarily the overall demand satisfaction.
+  // not necessarily overall demand satisfaction.
   satisfactionRatio: number
 
   allocations: HouseholdAllocation[]
   zoneResults: ZoneAllocation[]
 }
 
+// Development defaults to the local FastAPI server.
+// Production reads the API URL configured in Vercel
+// or .env.production.
+const API_BASE_URL = (
+  import.meta.env.VITE_API_URL ||
+  'http://127.0.0.1:8000'
+).replace(/\/+$/, '')
+
 export async function runJalNyay(
-  data: AllocationRequest
+  data: AllocationRequest,
 ): Promise<AllocationResult> {
-  const response = await fetch(
-    'http://127.0.0.1:8000/api/allocate',
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+  let response: Response
+
+  try {
+    response = await fetch(
+      `${API_BASE_URL}/api/allocate`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
       },
-      body: JSON.stringify(data),
-    }
-  )
+    )
+  } catch {
+    throw new Error(
+      'Unable to connect to the JalNyay backend. Please check that the API service is running and accessible.',
+    )
+  }
 
   if (!response.ok) {
-    let message = `JalNyay request failed: HTTP ${response.status}`
+    let message =
+      `JalNyay request failed: HTTP ${response.status}`
 
     try {
       const errorBody = await response.json()
+
       if (typeof errorBody.detail === 'string') {
         message = errorBody.detail
       }
