@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+@theme {
+  --color-pine: #173f46;
+  --color-teal: #3c817d;
+  --color-sage: #a9c5b1;
+  --color-ivory: #f3f0e6;
+  --color-clay: #c88f62;
+  --font-sans: "DM Sans", "Segoe UI", sans-serif;
+  --font-display: "Fraunces", Georgia, serif;
+}
+
+html {
+  font-family: var(--font-sans);
+}
+
+body {
+  margin: 0;
+  min-height: 100svh;
+  background: #f3f0e6;
+  color: #173f46;
+}
+
+#root {
+  min-height: 100svh;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
